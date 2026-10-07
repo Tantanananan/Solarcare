@@ -1,8 +1,379 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model SolarCare.Web.Models.AuthViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "SolarCare - Solar Health Diagnostic & Booking";
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --bg-alt: #1e293b;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --accent: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --error: #ef4444;
+            --success: #10b981;
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-border: #334155;
+        }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 5%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); text-decoration: none; }
+        
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-main); text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-auth-btn { background: var(--primary); padding: 0.5rem 1.25rem; border-radius: 2rem; color: white !important; font-weight: 600; }
+        .nav-auth-btn:hover { background: var(--primary-hover); }
+
+        /* Sections General */
+        section { padding: 6rem 5%; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+        .section-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; text-align: center; }
+        .section-desc { text-align: center; color: var(--text-muted); max-width: 600px; margin: 0 auto 4rem auto; line-height: 1.6; }
+
+        /* Hero Section */
+        #hero { 
+            background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.15), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent 40%);
+            align-items: center; text-align: center; 
+        }
+        .hero-title { font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; background: linear-gradient(to right, #60a5fa, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-subtitle { font-size: 1.25rem; color: var(--text-muted); max-width: 700px; margin-bottom: 3rem; }
+        .hero-buttons { display: flex; gap: 1rem; }
+        .btn-large { padding: 1rem 2.5rem; font-size: 1.1rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; transition: transform 0.3s, box-shadow 0.3s; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.5); }
+        .btn-secondary { background: var(--bg-alt); color: var(--text-main); border: 1px solid var(--input-border); }
+        .btn-secondary:hover { background: #334155; }
+
+        /* Info Portal */
+        #portal { background-color: var(--bg-alt); }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .info-card { background: var(--card-bg); padding: 2rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.05); }
+        .info-card h3 { color: var(--primary); margin-bottom: 1rem; font-size: 1.25rem; }
+        .info-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; }
+
+        /* Calculator */
+        #calculator { align-items: center; }
+        .calc-container { background: var(--card-bg); padding: 3rem; border-radius: 1.5rem; width: 100%; max-width: 600px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .calc-form-group { margin-bottom: 1.5rem; }
+        .calc-form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-muted); }
+        .calc-form-group input { width: 100%; padding: 1rem; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 0.5rem; color: white; font-size: 1rem; }
+        .calc-form-group input:focus { outline: none; border-color: var(--primary); }
+        .calc-btn { width: 100%; padding: 1rem; background: var(--accent); color: white; border: none; border-radius: 0.5rem; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+        .calc-btn:hover { background: #059669; }
+        #calc-result { margin-top: 2rem; padding: 1.5rem; border-radius: 0.5rem; display: none; text-align: center; font-weight: bold; font-size: 1.2rem; }
+
+        /* Packages */
+        #packages { background-color: var(--bg-alt); }
+        .package-card { background: var(--bg-color); padding: 2.5rem; border-radius: 1rem; text-align: center; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s; }
+        .package-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+        .pkg-price { font-size: 2.5rem; font-weight: 800; margin: 1.5rem 0; color: var(--primary); }
+        .pkg-price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+        .pkg-features { list-style: none; margin-bottom: 2rem; text-align: left; }
+        .pkg-features li { margin-bottom: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; }
+        .pkg-features li::before { content: '✓'; color: var(--accent); font-weight: bold; }
+
+        /* Auth Section */
+        #auth { align-items: center; background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1), var(--bg-color) 60%); }
+        .auth-container { width: 100%; max-width: 420px; perspective: 1000px; }
+        .auth-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden; }
+        .auth-header { text-align: center; margin-bottom: 2rem; }
+        .auth-header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--primary); }
+        .auth-header p { color: var(--text-muted); font-size: 0.95rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .form-control { width: 100%; padding: 0.75rem 1rem; background-color: var(--input-bg); border: 1px solid var(--input-border); border-radius: 0.75rem; color: var(--text-main); font-size: 0.95rem; transition: all 0.3s ease; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        .btn { width: 100%; padding: 0.875rem; background-color: var(--primary); color: white; border: none; border-radius: 0.75rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
+        .toggle-text { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); }
+        .toggle-text span { color: var(--primary); cursor: pointer; font-weight: 500; }
+        .toggle-text span:hover { text-decoration: underline; }
+        #register-form { display: none; }
+        
+        .alert { padding: 0.75rem 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .alert-error { background-color: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .alert-success { background-color: rgba(16, 185, 129, 0.1); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.2); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo">SolarCare</a>
+        <div class="nav-links">
+            <a href="#portal">Maintenance Guide</a>
+            <a href="#calculator">Demo Calculator</a>
+            <a href="#packages">Service Catalog</a>
+            <a href="#auth" class="nav-auth-btn">Sign In / Register</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="hero">
+        <h1 class="hero-title">Protect Your Solar Investment</h1>
+        <p class="hero-subtitle">SolarCare is an advanced diagnostic platform that evaluates residential solar performance and automates maintenance service bookings before minor degradation becomes critical failure.</p>
+        <div class="hero-buttons">
+            <a href="#calculator" class="btn-large btn-primary">Try Demo Calculator</a>
+            <a href="#portal" class="btn-large btn-secondary">Learn About Faults</a>
+        </div>
+    </section>
+
+    <!-- INFORMATIONAL PORTAL -->
+    <section id="portal">
+        <h2 class="section-title">Common Fault Signs & Maintenance Guides</h2>
+        <p class="section-desc">Educate yourself on the subtle warning signs of solar array degradation to prevent permanent hardware failure.</p>
+        
+        <div class="grid-3">
+            <div class="info-card">
+                <h3>Dirt & Debris Accumulation</h3>
+                <p>A thin layer of dust or bird droppings can cause up to 20% efficiency loss over time. Regular cleaning is essential to maintain optimal baseline capacity, especially in dry seasons.</p>
+            </div>
+            <div class="info-card">
+                <h3>Micro-Cracks & Hotspots</h3>
+                <p>Invisible micro-cracks from weather impact can lead to severe hotspots. Look for sudden unexplainable generation drops during peak sunlight hours as an early warning sign.</p>
+            </div>
+            <div class="info-card">
+                <h3>Inverter Faults</h3>
+                <p>Your inverter is the most fragile component. Frequent rebooting, unusual noise, or blinking red diagnostic lights mean it's time for an immediate technician checkup.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DEMO CALCULATOR -->
+    <section id="calculator">
+        <h2 class="section-title">Lightweight Health Demo Calculator</h2>
+        <p class="section-desc">Input your expected generation vs actual generation to get a quick estimate of your system's current efficiency status.</p>
+        
+        <div class="calc-container">
+            <div class="calc-form-group">
+                <label>Expected Daily Generation (kWh) Baseline</label>
+                <input type="number" id="calc-expected" placeholder="e.g. 30">
+            </div>
+            <div class="calc-form-group">
+                <label>Actual Daily Logged Generation (kWh)</label>
+                <input type="number" id="calc-actual" placeholder="e.g. 25">
+            </div>
+            <button class="calc-btn" onclick="runDemoCalc()">Calculate Efficiency</button>
+
+            <div id="calc-result"></div>
+        </div>
+    </section>
+
+    <!-- SERVICE PACKAGES -->
+    <section id="packages">
+        <h2 class="section-title">Service Catalog & Pricing Tiers</h2>
+        <p class="section-desc">Explore our available maintenance service packages handled by certified solar technicians.</p>
+        
+        <div class="grid-3">
+            <div class="package-card">
+                <h3>Standard Cleaning</h3>
+                <div class="pkg-price">₱1,500 <span>/ service</span></div>
+                <ul class="pkg-features">
+                    <li>Full array panel washing</li>
+                    <li>Debris removal</li>
+                    <li>Visual damage inspection</li>
+                </ul>
+                <a href="#auth" class="btn-large btn-secondary" style="display:block; width:100%; text-align:center; padding: 0.8rem;">Register to Book</a>
+            </div>
+            <div class="package-card" style="border-color: var(--primary);">
+                <h3>Preventative Inspection</h3>
+                <div class="pkg-price">₱2,500 <span>/ service</span></div>
+                <ul class="pkg-features">
+                    <li>Deep hardware diagnostics</li>
+                    <li>Wiring & connection checks</li>
+                    <li>Inverter health check</li>
+                </ul>
+                <a href="#auth" class="btn-large btn-primary" style="display:block; width:100%; text-align:center; padding: 0.8rem;">Register to Book</a>
+            </div>
+            <div class="package-card">
+                <h3>Part Replacement</h3>
+                <div class="pkg-price">₱3,000+ <span>/ part</span></div>
+                <ul class="pkg-features">
+                    <li>String Inverter Swap</li>
+                    <li>Panel Replacement</li>
+                    <li>Labor & Warranty included</li>
+                </ul>
+                <a href="#auth" class="btn-large btn-secondary" style="display:block; width:100%; text-align:center; padding: 0.8rem;">Register to Book</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUTH SECTION (Login/Register) -->
+    <section id="auth">
+        <div class="auth-container">
+            <div class="auth-card">
+                
+                @if (!string.IsNullOrEmpty(Model?.ErrorMessage))
+                {
+                    <div class="alert alert-error">@Model.ErrorMessage</div>
+                }
+                
+                @if (!string.IsNullOrEmpty(Model?.SuccessMessage))
+                {
+                    <div class="alert alert-success">@Model.SuccessMessage</div>
+                    <script>window.onload = () => { toggleForms('login'); document.getElementById('auth').scrollIntoView(); };</script>
+                }
+
+                <!-- LOGIN FORM -->
+                <div id="login-form">
+                    <div class="auth-header">
+                        <h1>Account Access</h1>
+                        <p>Sign in to manage your system health.</p>
+                    </div>
+                    
+                    <form method="post" asp-action="Login">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" name="Email" class="form-control" required placeholder="name@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" name="Password" class="form-control" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn">Sign In</button>
+                    </form>
+                    
+                    <div class="toggle-text">
+                        Don't have an account? <span onclick="toggleForms('register')">Register here</span>
+                    </div>
+                </div>
+
+                <!-- REGISTER FORM -->
+                <div id="register-form">
+                    <div class="auth-header">
+                        <h1>Create Account</h1>
+                        <p>Join SolarCare to monitor your solar array.</p>
+                    </div>
+                    
+                    <form method="post" asp-action="Register">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="FullName" class="form-control" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" name="Email" class="form-control" required placeholder="name@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" name="Password" class="form-control" required placeholder="At least 6 characters" minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <input type="password" name="ConfirmPassword" class="form-control" required placeholder="Must match password" minlength="6">
+                        </div>
+                        <button type="submit" class="btn">Create Account</button>
+                    </form>
+                    
+                    <div class="toggle-text">
+                        Already have an account? <span onclick="toggleForms('login')">Sign in</span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Demo Calculator Logic
+        function runDemoCalc() {
+            const expected = parseFloat(document.getElementById('calc-expected').value);
+            const actual = parseFloat(document.getElementById('calc-actual').value);
+            const resultBox = document.getElementById('calc-result');
+            
+            if (!expected || !actual) {
+                resultBox.style.display = 'block';
+                resultBox.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+                resultBox.style.color = '#fca5a5';
+                resultBox.innerText = "Please enter valid numerical values.";
+                return;
+            }
+
+            const efficiency = (actual / expected) * 100;
+            resultBox.style.display = 'block';
+            
+            if (efficiency >= 90) {
+                resultBox.style.backgroundColor = 'rgba(16, 185, 129, 0.2)';
+                resultBox.style.color = '#10b981';
+                resultBox.innerHTML = `Efficiency: ${efficiency.toFixed(1)}% <br> Status: Optimal`;
+            } else if (efficiency >= 70) {
+                resultBox.style.backgroundColor = 'rgba(245, 158, 11, 0.2)';
+                resultBox.style.color = '#f59e0b';
+                resultBox.innerHTML = `Efficiency: ${efficiency.toFixed(1)}% <br> Status: Degraded (Cleaning Recommended)`;
+            } else {
+                resultBox.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+                resultBox.style.color = '#ef4444';
+                resultBox.innerHTML = `Efficiency: ${efficiency.toFixed(1)}% <br> Status: Fault Detected (Inspection Required)`;
+            }
+        }
+
+        // Auth Form Toggler
+        function toggleForms(formType) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const card = document.querySelector('.auth-card');
+            
+            card.style.transform = 'scale(0.98)';
+            setTimeout(() => card.style.transform = 'scale(1)', 150);
+
+            if (formType === 'register') {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            } else {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            }
+        }
+
+        @if (Model?.ActiveForm == "register")
+        {
+            <text>
+            toggleForms('register');
+            document.getElementById('auth').scrollIntoView();
+            </text>
+        }
+        @if (!string.IsNullOrEmpty(Model?.ErrorMessage))
+        {
+            <text>document.getElementById('auth').scrollIntoView();</text>
+        }
+    </script>
+</body>
+</html>
